@@ -8,11 +8,21 @@ include(ExternalProject)
 
 file(MAKE_DIRECTORY ${CATKIN_DEVEL_PREFIX}/include)
 
-set(VERSION 0.5.0)
+
+# set(VERSION 0.5.0)  # Might cause "undefined reference to `google::kLogSiteUninitialized'"
+set(VERSION 0.4.0)
+
 ExternalProject_Add(glog_src
   URL https://github.com/google/glog/archive/v${VERSION}.zip
   UPDATE_COMMAND ""
-  CONFIGURE_COMMAND cd ../glog_src/ && mkdir -p build && cd build && cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=${CATKIN_DEVEL_PREFIX} ..
+  CONFIGURE_COMMAND
+      cd ../glog_src/ && mkdir -p build && 
+      cd build &&
+      cmake -G "Unix Makefiles" 
+          -DCMAKE_INSTALL_PREFIX=${CATKIN_DEVEL_PREFIX}
+          -DCMAKE_TOOLCHAIN_FILE:STRING=${CMAKE_TOOLCHAIN_FILE} -DCATKIN_DEVEL_PREFIX:PATH=${CATKIN_DEVEL_PREFIX}
+          -DBUILD_SHARED_LIBS=ON
+          ..
   BUILD_COMMAND cd ../glog_src/ && cmake --build build
   INSTALL_COMMAND cd ../glog_src/ && cmake --build build --target install
 )
